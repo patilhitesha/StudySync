@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>StudySync</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============ AUTH SCREEN (only thing visible until signed in) ============ -->
+<div id="authScreen">
+  <div class="authBrand">
+    <div>
+      <h1 class="wordmark">Study<em>Sync</em></h1>
+      <p class="tagline">Learn together. Track progress. Study smarter — one workspace for rooms, notes, attendance, GPA and tests.</p>
+    </div>
+    <div class="brandFooter">
+      <div><strong>Rooms</strong>collaborate by code</div>
+      <div><strong>Attendance</strong>auto-calculated</div>
+      <div><strong>GPA</strong>credit-weighted</div>
+      <div><strong>MCQs</strong>instant scoring</div>
+    </div>
+  </div>
+  <div class="authPane">
+    <div class="authCard">
+      <div class="segTabs">
+        <button id="segSignin" class="active" onclick="setAuthTab('signin')">Sign in</button>
+        <button id="segSignup" onclick="setAuthTab('signup')">Create account</button>
+      </div>
+
+      <form id="signinForm" class="authForm" onsubmit="return false;">
+        <h2>Welcome back</h2>
+        <p class="sub">Sign in to open your workspace.</p>
+        <div class="field">
+          <label for="si-email">Email</label>
+          <input id="si-email" type="email" autocomplete="username" placeholder="you@school.edu" />
+        </div>
+        <div class="field">
+          <label for="si-pass">Password</label>
+          <input id="si-pass" type="password" autocomplete="current-password" placeholder="••••••••" />
+        </div>
+        <button class="btn btn-primary btn-block" onclick="handleSignin()">Sign in</button>
+        <p class="formMsg" id="si-msg"></p>
+      </form>
+
+      <form id="signupForm" class="authForm" style="display:none;" onsubmit="return false;">
+        <h2>Create your account</h2>
+        <p class="sub">Takes a few seconds. Your data stays in this browser.</p>
+        <div class="field">
+          <label for="su-name">Full name</label>
+          <input id="su-name" placeholder="Asha Patil" />
+        </div>
+        <div class="field">
+          <label for="su-email">Email</label>
+          <input id="su-email" type="email" autocomplete="username" placeholder="you@school.edu" />
+        </div>
+        <div class="field">
+          <label for="su-pass">Password</label>
+          <input id="su-pass" type="password" autocomplete="new-password" placeholder="••••••••" oninput="renderPwRules()" />
+          <ul class="ruleList" id="pwRules">
+            <li data-rule="len">At least 8 characters</li>
+            <li data-rule="upper">One uppercase letter</li>
+            <li data-rule="lower">One lowercase letter</li>
+            <li data-rule="digit">One number</li>
+            <li data-rule="special">One special character</li>
+          </ul>
+        </div>
+        <button class="btn btn-primary btn-block" onclick="handleSignup()">Create account</button>
+        <p class="formMsg" id="su-msg"></p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP SHELL (hidden until authenticated) ============ -->
+<div id="appShell">
+  <div class="topbarMobile">
+    <div class="brandMini"><span class="dot"></span><span>StudySync</span></div>
+    <button class="btn btn-ghost" onclick="toggleMobileNav()">Menu</button>
+  </div>
+
+  <aside class="sidebar">
+    <div class="brandMini" style="display:none;" id="brandMiniDesktop"></div>
+    <div class="brandMini"><span class="dot"></span><span>StudySync</span></div>
+    <ul class="navList" id="navList">
+      <li><button data-tab="dashboard" onclick="setTab('dashboard')">Dashboard</button></li>
+      <li><button data-tab="rooms" onclick="setTab('rooms')">Rooms</button></li>
+      <li><button data-tab="notes" onclick="setTab('notes')">Notes</button></li>
+      <li><button data-tab="attendance" onclick="setTab('attendance')">Attendance</button></li>
+      <li><button data-tab="gpa" onclick="setTab('gpa')">GPA Calculator</button></li>
+      <li><button data-tab="tests" onclick="setTab('tests')">MCQ Tests</button></li>
+    </ul>
+    <div class="sidebarFoot">
+      <div class="who"><strong id="whoName">—</strong><span id="whoEmail"></span></div>
+      <button class="btn btn-ghost btn-block" onclick="handleLogout()">Log out</button>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <section id="page-dashboard" class="page">
+      <div class="pageHead"><h1 id="dashGreeting">Welcome back</h1><p>Here's where things stand today.</p></div>
+      <div class="statRow">
+        <div class="stat"><div class="num" id="statRooms">0</div><div class="lbl">Rooms joined</div></div>
+        <div class="stat"><div class="num" id="statNotes">0</div><div class="lbl">Notes saved</div></div>
+        <div class="stat"><div class="num" id="statAttendance">—</div><div class="lbl">Overall attendance</div></div>
+        <div class="stat"><div class="num" id="statAttempts">0</div><div class="lbl">Tests attempted</div></div>
+      </div>
+      <div class="grid grid-2">
+        <div class="card">
+          <h2>Recent notes</h2><p class="sub">Latest across all your rooms</p>
+          <ul class="plain" id="dashNotes"></ul>
+        </div>
+        <div class="card">
+          <h2>Your rooms</h2><p class="sub">Jump back in</p>
+          <ul class="plain" id="dashRooms"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="page-rooms" class="page" style="display:none;">
+      <div class="pageHead"><h1>Study rooms</h1><p>Create a room or join one with a code from a classmate.</p></div>
+      <div class="grid grid-2">
+        <div class="card">
+          <h2>Create a room</h2><p class="sub">Give it a name and subject</p>
+          <div class="field"><label class="small">Room name</label><input id="rm-name" placeholder="DSA Warriors" /></div>
+          <div class="field" style="margin-top:10px;"><label class="small">Subject</label><input id="rm-subject" placeholder="Computer Science" /></div>
+          <div class="field" style="margin-top:10px;"><label class="small">Description (optional)</label><textarea id="rm-desc" rows="2" placeholder="Prep group for the DSA exam"></textarea></div>
+          <button class="btn btn-primary" style="margin-top:14px;" onclick="createRoom()">Create room</button>
+          <p class="formMsg" id="rm-msg"></p>
+        </div>
+        <div class="card">
+          <h2>Join a room</h2><p class="sub">Enter the invite code</p>
+          <div class="field"><label class="small">Room code</label><input id="rm-code" placeholder="e.g. AB3X7Q" style="text-transform:uppercase;" /></div>
+          <button class="btn btn-primary" style="margin-top:14px;" onclick="joinRoom()">Join room</button>
+          <p class="formMsg" id="join-msg"></p>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <h2>My rooms</h2><p class="sub">Rooms you own or have joined</p>
+        <ul class="plain" id="room-list"></ul>
+      </div>
+    </section>
+
+    <section id="page-notes" class="page" style="display:none;">
+      <div class="pageHead"><h1>Notes</h1><p>Room-scoped notes, organized by subject.</p></div>
+      <div class="card">
+        <h2>Add a note</h2>
+        <label class="small">Room</label>
+        <select id="note-room" onchange="loadNotes()"></select>
+        <div style="margin-top:10px;"><label class="small">Title</label><input id="note-title" placeholder="Binary Search Trees" /></div>
+        <div style="margin-top:10px;"><label class="small">Content</label><textarea id="note-content" rows="4" placeholder="Key properties, complexity, examples..."></textarea></div>
+        <button class="btn btn-primary" style="margin-top:14px;" onclick="addNote()">Save note</button>
+        <p class="formMsg" id="note-msg"></p>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <h2>Room notes</h2>
+        <ul class="plain" id="note-list"></ul>
+      </div>
+    </section>
+
+    <section id="page-attendance" class="page" style="display:none;">
+      <div class="pageHead"><h1>Attendance</h1><p>Log classes and watch your percentage update automatically.</p></div>
+      <div class="card">
+        <h2>Log a subject</h2>
+        <div class="grid" style="grid-template-columns:2fr 1fr 1fr;">
+          <div><label class="small">Subject</label><input id="att-subject" placeholder="Physics" /></div>
+          <div><label class="small">Attended</label><input id="att-attended" type="number" min="0" /></div>
+          <div><label class="small">Total</label><input id="att-total" type="number" min="0" /></div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:14px;" onclick="logAttendance()">Save</button>
+        <p class="formMsg" id="att-msg"></p>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <h2>Overview</h2>
+        <div id="att-overall" style="margin-bottom:14px;"></div>
+        <ul class="plain" id="att-list"></ul>
+      </div>
+    </section>
+
+    <section id="page-gpa" class="page" style="display:none;">
+      <div class="pageHead"><h1>GPA calculator</h1><p>Credit-weighted SGPA using a standard 10-point grading scale.</p></div>
+      <div class="card">
+        <h2>Enter subjects</h2>
+        <p class="sub">One per line: <code>Name, Credits, Marks</code></p>
+        <textarea id="gpa-subjects" rows="6">Mathematics, 4, 88
+Physics, 4, 76
+Chemistry, 3, 65
+English, 2, 91</textarea>
+        <button class="btn btn-primary" style="margin-top:14px;" onclick="computeSGPA()">Calculate SGPA</button>
+        <div id="gpa-result" style="margin-top:16px;"></div>
+      </div>
+    </section>
+
+    <section id="page-tests" class="page" style="display:none;">
+      <div class="pageHead"><h1>MCQ tests</h1><p>Create a quick quiz for a room, then take it with instant scoring.</p></div>
+      <div class="card">
+        <h2>Create a sample test</h2>
+        <label class="small">Room</label>
+        <select id="test-room"></select>
+        <div style="margin-top:10px;"><label class="small">Title</label><input id="test-title" placeholder="Chapter 3 Quiz" /></div>
+        <p class="hint" style="margin-top:8px;">Uses a fixed 3-question sample with 0.5-mark negative marking, for demonstration.</p>
+        <button class="btn btn-primary" style="margin-top:10px;" onclick="createTest()">Create test</button>
+        <p class="formMsg" id="test-msg"></p>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <h2>Take the test</h2>
+        <div id="test-questions"><p class="empty">Create a test above to begin.</p></div>
+        <button class="btn btn-primary" id="submitTestBtn" style="margin-top:6px;display:none;" onclick="submitTest()">Submit answers</button>
+        <div id="submit-result" style="margin-top:14px;"></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toastWrap" id="toastWrap"></div>
+
+<script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+# OS/editor files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs and caches
+*.log
+npm-debug.log*
+coverage/
+.cache/
+
+# Frontend build output
+node_modules/
+StudySync/react/node_modules/
+StudySync/react/dist/
+StudySync/react/.vite/
+
+# Java build output
+StudySync/target/
+StudySync/*.class
+StudySync/**/*.class
+StudySync/**/*.jar
+StudySync/**/*.war
+StudySync/**/*.ear
+
+# Local environment secrets
+.env
+.env.*
+
+# Generated project metadata
+*.iml
+*.class

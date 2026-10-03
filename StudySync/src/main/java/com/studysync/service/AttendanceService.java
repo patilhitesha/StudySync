@@ -1,0 +1,2 @@
+package com.studysync.service;
+public class AttendanceService { public double percentage(int attended,int total){if(attended<0||total<0)throw new IllegalArgumentException("Values cannot be negative");if(attended>total)throw new IllegalArgumentException("Attended cannot exceed total");if(total==0)return 0;return Math.round((attended*10000.0/total))/100.0;} public String status(double p){return p<65?"critical":p<75?"warn":"good";} }

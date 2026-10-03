@@ -1,0 +1,8 @@
+{
+  "name": "studysync-root",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix ./StudySync/react run dev -- --host 0.0.0.0",
+    "start": "npm run dev"
+  }
+}

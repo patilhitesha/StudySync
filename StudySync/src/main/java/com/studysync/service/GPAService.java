@@ -1,0 +1,2 @@
+package com.studysync.service;
+public class GPAService { public double calculate(double[] credits,double[] gradePoints){if(credits.length!=gradePoints.length||credits.length==0)throw new IllegalArgumentException("Enter valid subjects");double tc=0,points=0;for(int i=0;i<credits.length;i++){if(credits[i]<=0)throw new IllegalArgumentException("Credits must be positive");tc+=credits[i];points+=credits[i]*gradePoints[i];}return Math.round(points/tc*100.0)/100.0;} }
